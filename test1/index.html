@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<script src="jquery-1.11.3.min.js"></script>
+<head>
+	<title>nera</title>
+	<style type="text/css">
+	.container{
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform:translate(-50%,-50%);
+		background-color: green;
+		width: 600px;
+		height: 600px;
+	}
+	.kalam{
+		position: relative;
+		float: left;
+		width: 180px;
+		height: 180px;
+		margin: 10px;
+		background-color: yellow;
+	}
+	.katta{
+		position: absolute;
+		left: 740px;top: 230px;
+		width: 140px;
+		height: 140px;
+		border-radius: 150px;
+	}
+	.score{
+		position: absolute;
+		right: 650px;
+		top: 200px;
+		height: 200px;
+		width: 200px;
+		background-color: green;
+		text-align: center;
+	}
+	</style>
+	<script type="text/javascript">
+	var katta_id="12",kalam_id,status="begin",nxt_katta=1,matrix=[10,10,10,10,10,10,10,10,10],bwin=0,rwin=0;
+	function kalam_click(obj){
+		kalam_id=$(obj).attr("id");
+		if(matrix[kalam_id-1]==10){
+		var pos=$("#"+kalam_id).position();
+
+		if(status=="begin"){
+			$("#k"+nxt_katta+"0").animate({left:pos.left+30,top:pos.top+30});
+
+			if($("#k"+nxt_katta+"0").hasClass("blue"))
+			matrix[kalam_id-1]=1;
+			else
+			matrix[kalam_id-1]=0;
+			$("#k"+nxt_katta+"0").attr("id","k"+kalam_id);
+
+			nxt_katta++;
+			if(nxt_katta==7)
+				if((bwin+rwin)%2==0)
+				status="playr";
+			else
+				status="playb";
+
+
+
+		}
+
+
+		if(move_check()=="success" ){
+		if(status=="moveb"){
+			$("#"+katta_id).animate({left:pos.left+30,top:pos.top+30});
+			matrix[katta_id[1]-1]=10;matrix[kalam_id-1]=1;
+			$("#"+katta_id).attr("id","k"+kalam_id);
+			status="playr";
+		}
+		else if(status=="mover"){
+			$("#"+katta_id).animate({left:pos.left+30,top:pos.top+30});
+			matrix[katta_id[1]-1]=10;matrix[kalam_id-1]=0;
+			$("#"+katta_id).attr("id","k"+kalam_id);
+			status="playb";
+		}
+
+		}
+
+		}
+		win();
+		console.log(matrix);
+	}
+	function katta_click(obj){
+
+		katta_id=$(obj).attr("id");
+		if($( "#"+katta_id ).hasClass( "red" ) && status=="playr")
+		status="mover";
+		else if($( "#"+katta_id ).hasClass( "blue" ) && status=="playb")
+		status="moveb";
+
+	}
+	function move_check(){
+	var stat="success";
+	if(kalam_id%2==0 && katta_id[1]%2==0 )
+		stat="fail_diamond";
+
+	else if(Math.abs(kalam_id-katta_id[1])!=1 && Math.abs(kalam_id-katta_id[1])!=3 && katta_id[1]!=5 && kalam_id!=5)
+		stat="fail_jump";
+	return(stat);
+	}
+	function win(){
+		if(matrix[0]+matrix[1]+matrix[2]==0)
+			win_change("red");
+		if(matrix[3]+matrix[4]+matrix[5]==0)
+			win_change("red");
+		if(matrix[6]+matrix[7]+matrix[8]==0)
+			win_change("red");
+		if(matrix[0]+matrix[3]+matrix[6]==0)
+			win_change("red");
+		if(matrix[1]+matrix[4]+matrix[7]==0)
+			win_change("red");
+		if(matrix[2]+matrix[5]+matrix[8]==0)
+			win_change("red");
+		if(matrix[0]+matrix[4]+matrix[8]==0)
+			win_change("red");
+		if(matrix[2]+matrix[4]+matrix[6]==0)
+			win_change("red");
+
+		if(matrix[0]+matrix[1]+matrix[2]==3)
+			win_change("blue");
+		if(matrix[3]+matrix[4]+matrix[5]==3)
+			win_change("blue");
+		if(matrix[6]+matrix[7]+matrix[8]==3)
+			win_change("blue");
+		if(matrix[0]+matrix[3]+matrix[6]==3)
+			win_change("blue");
+		if(matrix[1]+matrix[4]+matrix[7]==3)
+			win_change("blue");
+		if(matrix[2]+matrix[5]+matrix[8]==3)
+			win_change("blue");
+		if(matrix[0]+matrix[4]+matrix[8]==3)
+			win_change("blue");
+		if(matrix[2]+matrix[4]+matrix[6]==3)
+			win_change("blue");
+	}
+
+	function win_change(player){
+var color1,color2;
+if(player=="red")
+	rwin++;
+else
+	bwin++;
+$(".score").html("<br><h2><b>SCORE</b></h2><br>blue<br>"+bwin+"<br>red<br>"+rwin);
+
+katta_id="12";status="begin";nxt_katta=1;
+
+$(".katta").animate({left: "740px",top: "230px"});
+$(".katta").removeClass("red");
+$(".katta").removeClass("blue");
+var j=1;
+for(var i=1;i<10 && j<7;i++)
+{
+	if(matrix[i-1]!=10)
+	{
+		$("#k"+i).attr("id","k"+j+"0");
+		if((j+bwin+rwin)%2==0)
+		{
+		$("#k"+j+"0").css("background-color","blue");
+		$("#k"+j+"0").addClass("blue");
+		}
+		else
+		{
+		$("#k"+j+"0").css("background-color","red");
+		$("#k"+j+"0").addClass("red");
+		}
+		j++;
+	}
+}
+if(j!=7)
+for(;j<7;j++)
+{
+
+		if((j+bwin+rwin)%2==0)
+		{
+		$("#k"+j+"0").css("background-color","blue");
+		$("#k"+j+"0").addClass("blue");
+		}
+		else
+		{
+		$("#k"+j+"0").css("background-color","red");
+		$("#k"+j+"0").addClass("red");
+		}
+		j++;
+}
+matrix=[10,10,10,10,10,10,10,10,10];
+	}
+	</script>
+</head>
+<body>
+<div class="container">
+
+	<div class="kalam" id="1" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="2" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="3" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="4" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="5" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="6" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="7" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="8" onclick="kalam_click(this);"></div>
+	<div class="kalam" id="9" onclick="kalam_click(this);"></div>
+
+
+	<div class="katta blue" id="k60" style="background-color:blue" onclick="katta_click(this);"></div>
+	<div class="katta red" id="k50" style="background-color:red" onclick="katta_click(this);"></div>
+	<div class="katta blue" id="k40" style="background-color:blue" onclick="katta_click(this);"></div>
+	<div class="katta red" id="k30" style="background-color:red" onclick="katta_click(this);"></div>
+	<div class="katta blue" id="k20" style="background-color:blue" onclick="katta_click(this);"></div>
+	<div class="katta red" id="k10" style="background-color:red" onclick="katta_click(this);"></div>
+
+
+
+
+	<div class="score" ><br><h2><b>SCORE</b></h2><br>blue<br>0<br>red<br>0</div>
+</div>
+</body>
+</html>
